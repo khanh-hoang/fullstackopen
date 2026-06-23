@@ -1,0 +1,40 @@
+DELETE http://localhost:3001/api/blogs/6a385c89e3088671e7a2e7dc
+
+### 
+GET http://localhost:3001/api/blogs
+
+###
+GET http://localhost:3001/api/blogs/67c2ee98bfd7e820dd7cd659
+
+###
+POST http://localhost:3001/api/blogs
+Content-Type: application/json
+
+{
+  "title": "Test",
+  "author": "Test",
+  "url": "http://test.com",
+  "likes": 0
+}
+
+###
+POST http://localhost:3001/api/blogs
+Content-Type: application/json
+
+{
+  "title": "Test2",
+  "author": "Test2",
+  "url": "http://test2.com",
+  "likes": 0
+}
+
+###
+PUT http://localhost:3001/api/blogs/6a385cace3088671e7a2e7dd
+Content-Type: application/json
+
+{
+  "title": "Test",
+  "author": "New",
+  "url": "http://new.com",
+  "likes": 100
+}

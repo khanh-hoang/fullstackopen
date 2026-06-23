@@ -1,6 +1,3 @@
-DELETE http://localhost:3001/api/blogs/6a385c89e3088671e7a2e7dc
-
-### 
 GET http://localhost:3001/api/blogs
 
 ###
@@ -9,6 +6,7 @@ GET http://localhost:3001/api/blogs/67c2ee98bfd7e820dd7cd659
 ###
 POST http://localhost:3001/api/blogs
 Content-Type: application/json
+Authorization: Bearer token
 
 {
   "title": "Test",
@@ -38,3 +36,49 @@ Content-Type: application/json
   "url": "http://new.com",
   "likes": 100
 }
+
+###
+GET http://localhost:3001/api/users
+
+###
+POST http://localhost:3001/api/users
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "name": "Test User",
+  "password": "testpassword"
+}
+
+###
+POST http://localhost:3001/api/login
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "testpassword"
+}
+
+###
+POST http://localhost:3001/api/users
+Content-Type: application/json
+
+{
+  "username": "root",
+  "name": "Superuser",
+  "password": "root"
+}
+
+###
+POST http://localhost:3001/api/login
+Content-Type: application/json
+
+{
+  "username": "root",
+  "password": "root"
+}
+
+###
+DELETE http://localhost:3001/api/blogs/6a3b11ef636a3608383fc8d9
+Authorization: Bearer token
+

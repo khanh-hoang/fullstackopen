@@ -1,9 +1,12 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { TextField, Button } from '@mui/material'
 
 const BlogForm = ({ createBlog }) => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
+  const navigate = useNavigate()
 
   const onSubmit = (event) => {
     event.preventDefault()
@@ -11,31 +14,17 @@ const BlogForm = ({ createBlog }) => {
     setTitle('')
     setAuthor('')
     setUrl('')
+    navigate('/')
   }
 
   return (
     <div>
       <h2>create new</h2>
       <form onSubmit={onSubmit}>
-        <div>
-          <label>
-            title:
-            <input type="text" value={title} onChange={({ target }) => setTitle(target.value)} />
-          </label>
-        </div>
-        <div>
-          <label>
-            author:
-            <input type="text" value={author} onChange={({ target }) => setAuthor(target.value)} />
-          </label>
-        </div>
-        <div>
-          <label>
-            url:
-            <input type="text" value={url} onChange={({ target }) => setUrl(target.value)} />
-          </label>
-        </div>
-        <button type="submit">create</button>
+        <TextField fullWidth sx={{ mb: 2 }} label="title" value={title} onChange={({ target }) => setTitle(target.value)} />
+        <TextField fullWidth sx={{ mb: 2 }} label="author" value={author} onChange={({ target }) => setAuthor(target.value)} />
+        <TextField fullWidth sx={{ mb: 2 }} label="url" value={url} onChange={({ target }) => setUrl(target.value)} />
+        <Button type="submit" variant="contained">create</Button>
       </form>
     </div>
   )

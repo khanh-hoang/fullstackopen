@@ -1,11 +1,15 @@
-import { useState, useEffect, useRef } from 'react'
-import Blog from './components/Blog'
+import { useState, useEffect } from 'react'
 import Notification from './components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
-import Togglable from './components/Togglable'
+import BlogList from './components/BlogList'
+import BlogView from './components/BlogView'
+import {
+  Routes, Route, Link, useMatch, useNavigate
+} from 'react-router-dom'
+import { Container, AppBar, Toolbar, Button } from '@mui/material'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -14,7 +18,7 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const blogFormRef = useRef()
+  const navigate = useNavigate()
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -47,6 +51,7 @@ const App = () => {
       setUser(user)
       setUsername('')
       setPassword('')
+      navigate('/')
     } catch {
       showNotification('wrong username or password', 'error')
     }
@@ -56,14 +61,14 @@ const App = () => {
     window.localStorage.removeItem('loggedBlogappUser')
     blogService.setToken(null)
     setUser(null)
+    navigate('/')
   }
 
   const handleCreateBlog = async (blogObject) => {
     try {
       const newBlog = await blogService.create(blogObject)
-      blogFormRef.current.toggleVisibility()
       setBlogs(blogs.concat({ ...newBlog, user: { id: user.id, username: user.username, name: user.name } }))
-      showNotification(`${newBlog.title} by ${newBlog.author} added`)
+      showNotification(`a new blog ${newBlog.title} by ${newBlog.author} added`)
     } catch {
       showNotification('failed to create blog', 'error')
     }
@@ -95,12 +100,33 @@ const App = () => {
     }
   }
 
-  if (user === null) {
-    return (
-      <div>
-        <h2>Log in to application</h2>
-        <Notification message={notificationMessage} type={notificationType} />
-        <Togglable buttonLabel="log in">
+  const match = useMatch('/blogs/:id')
+  const blogMatch = match
+    ? blogs.find(b => b.id === match.params.id)
+    : null
+
+  const hoverStyle = { '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' } }
+
+  return (
+    <Container>
+      <AppBar position="static">
+        <Toolbar>
+          <h6 style={{ flexGrow: 1, margin: 0, color: 'white', fontSize: '1.5rem', fontFamily: 'Roboto' }}>Blog App</h6>
+          <Button color="inherit" component={Link} to="/" sx={hoverStyle}>blogs</Button>
+          {user && <Button color="inherit" component={Link} to="/create" sx={hoverStyle}>new blog</Button>}
+          {user
+            ? <>
+                <Button color="inherit" onClick={handleLogout} sx={hoverStyle}>logout</Button>
+              </>
+            : <Button color="inherit" component={Link} to="/login" sx={hoverStyle}>login</Button>
+          }
+        </Toolbar>
+      </AppBar>
+
+      <Notification message={notificationMessage} type={notificationType} />
+
+      <Routes>
+        <Route path="/login" element={
           <LoginForm
             username={username}
             password={password}
@@ -108,28 +134,18 @@ const App = () => {
             handlePasswordChange={({ target }) => setPassword(target.value)}
             handleSubmit={handleLogin}
           />
-        </Togglable>
-      </div>
-    )
-  }
-
-  return (
-    <div>
-      <h2>blogs</h2>
-      <Notification message={notificationMessage} type={notificationType} />
-      <p>
-        {user.name} logged in
-        <button onClick={handleLogout}>logout</button>
-      </p>
-
-      <Togglable buttonLabel="create new blog" ref={blogFormRef}>
-        <BlogForm createBlog={handleCreateBlog} />
-      </Togglable>
-
-      {[...blogs].sort((a, b) => b.likes - a.likes).map(blog =>
-        <Blog key={blog.id} blog={blog} handleLike={handleLike} handleDelete={handleDelete} loggedUser={user} />
-      )}
-    </div>
+        } />
+        <Route path="/" element={
+          <><h2>blogs</h2><BlogList blogs={blogs} /></>
+        } />
+        <Route path="/blogs/:id" element={
+          <BlogView blog={blogMatch} handleLike={handleLike} handleDelete={handleDelete} loggedUser={user} />
+        } />
+        <Route path="/create" element={
+          <BlogForm createBlog={handleCreateBlog} />
+        } />
+      </Routes>
+    </Container>
   )
 }
 

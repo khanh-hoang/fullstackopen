@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom'
 import Blog from './Blog'
 
 const blog = {
@@ -11,46 +11,15 @@ const blog = {
 }
 
 describe('<Blog />', () => {
-  test('renders title and author, but not URL or likes by default', () => {
-    const { container } = render(
-      <Blog blog={blog} handleLike={() => {}} handleDelete={() => {}} loggedUser={null} />
-    )
-
-    expect(screen.getByText('Test', { exact: false })).toBeDefined()
-    expect(screen.getByText('Test Author', { exact: false })).toBeDefined()
-    expect(container.querySelector('.blog-details')).toBeNull()
-    expect(screen.queryByText('https://test.com')).toBeNull()
-    expect(screen.queryByText('likes', { exact: false })).toBeNull()
-  })
-
-  test('shows URL and likes after clicking view', async () => {
-    const user = userEvent.setup()
-    const { container } = render(
-      <Blog blog={blog} handleLike={() => {}} handleDelete={() => {}} loggedUser={null} />
-    )
-
-    await user.click(screen.getByText('view'))
-
-    const details = container.querySelector('.blog-details')
-    expect(details).not.toBeNull()
-    expect(screen.getByText('https://test.com')).toBeDefined()
-    expect(screen.getByText('likes', { exact: false })).toBeDefined()
-  })
-
-  test('clicking like twice calls handler twice', async () => {
-    const mockLike = vi.fn()
-    const user = userEvent.setup()
-
+  test('renders blog title as a link', () => {
     render(
-      <Blog blog={blog} handleLike={mockLike} handleDelete={() => {}} loggedUser={null} />
+      <MemoryRouter>
+        <Blog blog={blog} />
+      </MemoryRouter>
     )
 
-    await user.click(screen.getByText('view'))
-    const likeButton = screen.getByText('like')
-    await user.click(likeButton)
-    await user.click(likeButton)
-
-    expect(mockLike.mock.calls).toHaveLength(2)
+    expect(screen.getByText('Test by Test Author')).toBeDefined()
+    expect(screen.queryByText('like')).toBeNull()
   })
 })
 
